@@ -12,6 +12,7 @@ The project is intentionally heuristic-first. Version `0.1.0` prioritizes useful
 ## Features
 
 - Single-track and folder batch analysis.
+- Parallel folder analysis with resumable outputs.
 - JSON output validated with Pydantic.
 - Markdown reports designed for human review and LLM context.
 - Metadata extraction: filename, path, duration, sample rate and channels.
@@ -157,6 +158,21 @@ Change analysis frame rate:
 ```bash
 groove-analyser analyze ./track.mp3 --frames-per-second 20
 ```
+
+Analyze a large folder faster:
+
+```bash
+groove-analyser analyze ./audio-folder --out ./reports --fast --workers 4 --skip-existing
+```
+
+Performance-oriented options:
+
+- `--workers 0` uses an automatic worker count for folders, capped conservatively at 4 by default. Use `--workers 8` or another explicit value if your machine has enough CPU and memory.
+- `--fast` lowers analysis cost to `22050 Hz`, `10` frames per second and `2048` FFT while keeping STFT key estimation.
+- `--sample-rate 22050` lowers decode/resampling cost. Use `--sample-rate 0` to keep the source rate.
+- `--n-fft 2048` reduces spectral analysis cost compared with the default `4096`.
+- `--key-mode stft` is the default fast key estimate. Use `--key-mode cqt` for a heavier estimate or `--key-mode none` to skip key estimation.
+- `--skip-existing` skips tracks whose requested JSON/Markdown outputs already exist, which is useful when resuming large batches.
 
 ## Output Files
 
