@@ -26,6 +26,7 @@ The project is intentionally heuristic-first. Version `0.1.0` prioritizes useful
 ## Requirements
 
 - Python `>=3.11`
+- `uv` for development and local project management
 - macOS, Linux or Windows with a working Python environment
 - Optional: `ffmpeg` if your local audio stack cannot decode a specific compressed format
 
@@ -37,10 +38,10 @@ Supported input extensions:
 
 ## Install From GitHub
 
-For CLI usage, `pipx` is recommended because it installs the app in an isolated environment and exposes `groove-analyser` globally.
+For CLI usage, `uv tool install` is recommended because it installs the app in an isolated environment and exposes `groove-analyser` globally.
 
 ```bash
-pipx install git+https://github.com/<owner>/groove-analyser.git
+uv tool install git+https://github.com/<owner>/groove-analyser.git
 ```
 
 Then run it from any folder:
@@ -52,13 +53,13 @@ groove-analyser analyze ./music/track.mp3 --out ./reports
 Upgrade after pulling new commits or tags:
 
 ```bash
-pipx upgrade groove-analyser
+uv tool upgrade groove-analyser
 ```
 
 Install a specific tag:
 
 ```bash
-pipx install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
+uv tool install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
 ```
 
 ## Install For Development
@@ -66,26 +67,37 @@ pipx install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
 ```bash
 git clone https://github.com/<owner>/groove-analyser.git
 cd groove-analyser
-python3 -m venv .venv
-.venv/bin/python -m pip install -e ".[dev]"
+uv sync --extra dev
 ```
 
 Run tests:
 
 ```bash
-.venv/bin/python -m pytest
+uv run pytest
 ```
 
-Run the CLI from the local virtualenv:
+Run type checks:
 
 ```bash
-.venv/bin/groove-analyser --help
+uv run basedpyright
+```
+
+Run the CLI from the local environment:
+
+```bash
+uv run groove-analyser --help
 ```
 
 ## Quick Start
 
 ```bash
 groove-analyser analyze ./audio/track.mp3 --out ./reports
+```
+
+During development, prefix commands with `uv run`:
+
+```bash
+uv run groove-analyser analyze ./audio/track.mp3 --out ./reports
 ```
 
 This creates:
@@ -219,7 +231,7 @@ git push origin v0.1.0
 3. Install from another machine or folder:
 
 ```bash
-pipx install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
+uv tool install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
 ```
 
 See `docs/releasing.md` for the full workflow.

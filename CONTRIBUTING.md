@@ -3,20 +3,25 @@
 ## Development Setup
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -e ".[dev]"
+uv sync --extra dev
 ```
 
 ## Test
 
 ```bash
-.venv/bin/python -m pytest
+uv run pytest
+```
+
+## Type Check
+
+```bash
+uv run basedpyright
 ```
 
 ## Run Locally
 
 ```bash
-.venv/bin/groove-analyser analyze ./track.mp3 --out ./reports
+uv run groove-analyser analyze ./track.mp3 --out ./reports
 ```
 
 ## Guidelines

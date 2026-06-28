@@ -7,13 +7,14 @@ This project can be installed directly from GitHub without publishing to PyPI.
 Run tests before tagging:
 
 ```bash
-.venv/bin/python -m pytest
+uv run pytest
+uv run basedpyright
 ```
 
 Optionally test against a local audio file:
 
 ```bash
-.venv/bin/groove-analyser analyze ./music/example.mp3 --out ./reports-test
+uv run groove-analyser analyze ./music/example.mp3 --out ./reports-test
 ```
 
 Do not commit local audio files, generated reports or virtual environments. They are ignored by `.gitignore`.
@@ -25,12 +26,12 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-## Install With pipx
+## Install With uv
 
 Recommended:
 
 ```bash
-pipx install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
+uv tool install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
 ```
 
 Use from any folder:
@@ -42,19 +43,27 @@ groove-analyser analyze ./track.mp3 --out ./reports
 Upgrade:
 
 ```bash
-pipx upgrade groove-analyser
+uv tool upgrade groove-analyser
 ```
 
 Reinstall a specific version:
 
 ```bash
-pipx uninstall groove-analyser
+uv tool uninstall groove-analyser
+uv tool install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
+```
+
+## Install With pipx Or pip
+
+Use this only if you are not using `uv`.
+
+With `pipx`:
+
+```bash
 pipx install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
 ```
 
-## Install With pip
-
-Use this if you want the CLI inside a specific virtualenv:
+Inside a specific virtualenv:
 
 ```bash
 python -m pip install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
