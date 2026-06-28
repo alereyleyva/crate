@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -12,7 +12,7 @@ SectionLabel = Literal["intro", "groove", "breakdown", "build", "drop", "outro",
 
 
 class GrooveBaseModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid", populate_by_name=True)
 
 
 class TrackMetadata(GrooveBaseModel):

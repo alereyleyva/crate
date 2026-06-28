@@ -20,16 +20,18 @@ def test_track_analysis_schema_serializes_with_global_alias():
 
 
 def test_normalized_schema_values_are_clamped():
-    analysis = TrackAnalysis(
-        track=TrackMetadata(
-            id="abc",
-            filename="track.wav",
-            path="track.wav",
-            duration_seconds=10.0,
-            sample_rate=44100,
-            channels=2,
-        ),
-        **{"global": {"energy": 2.0, "bass_weight": -1.0}},
+    analysis = TrackAnalysis.model_validate(
+        {
+            "track": {
+                "id": "abc",
+                "filename": "track.wav",
+                "path": "track.wav",
+                "duration_seconds": 10.0,
+                "sample_rate": 44100,
+                "channels": 2,
+            },
+            "global": {"energy": 2.0, "bass_weight": -1.0},
+        }
     )
 
     assert analysis.global_.energy == 1.0

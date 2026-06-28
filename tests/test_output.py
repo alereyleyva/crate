@@ -1,8 +1,10 @@
+from pathlib import Path
+
 from groove_analyser.output import write_batch_index, write_track_outputs
 from groove_analyser.schema import TrackAnalysis, TrackMetadata
 
 
-def test_write_track_outputs_respects_requested_formats(tmp_path):
+def test_write_track_outputs_respects_requested_formats(tmp_path: Path):
     analysis = TrackAnalysis(
         track=TrackMetadata(
             id="abc",
@@ -21,7 +23,7 @@ def test_write_track_outputs_respects_requested_formats(tmp_path):
     assert not (tmp_path / "track.report.md").exists()
 
 
-def test_write_batch_index(tmp_path):
+def test_write_batch_index(tmp_path: Path):
     index_path = write_batch_index(tmp_path, [{"filename": "track.wav", "json": "track.analysis.json"}])
 
     assert index_path.exists()

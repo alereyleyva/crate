@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from groove_analyser.schema import TrackAnalysis
+from groove_analyser.schema import MixRegion, TrackAnalysis
 from groove_analyser.utils import format_time
 
 
@@ -32,8 +32,10 @@ def render_markdown(analysis: TrackAnalysis) -> str:
     ]
     for section in analysis.sections:
         lines.append(
-            f"| {section.label.capitalize()} | {format_time(section.start)} | {format_time(section.end)} | "
-            f"{section.start_bar}-{section.end_bar} | {section.energy_mean:.2f} | {section.mixability:.2f} | {section.description} |"
+            (
+                f"| {section.label.capitalize()} | {format_time(section.start)} | {format_time(section.end)} | "
+                f"{section.start_bar}-{section.end_bar} | {section.energy_mean:.2f} | {section.mixability:.2f} | {section.description} |"
+            )
         )
 
     lines.extend([
@@ -74,11 +76,13 @@ def render_markdown(analysis: TrackAnalysis) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def _render_mix_regions(regions) -> list[str]:
+def _render_mix_regions(regions: list[MixRegion]) -> list[str]:
     if not regions:
         return ["No strong candidates detected by the v1 heuristics."]
     return [
-        f"- {format_time(region.start)}-{format_time(region.end)} "
-        f"(bars {region.start_bar}-{region.end_bar}, score {region.score:.2f}): {region.reason}"
+        (
+            f"- {format_time(region.start)}-{format_time(region.end)} "
+            f"(bars {region.start_bar}-{region.end_bar}, score {region.score:.2f}): {region.reason}"
+        )
         for region in regions
     ]

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
+from typing import Any, cast
 
 import numpy as np
 
@@ -10,15 +11,16 @@ import numpy as np
 AUDIO_EXTENSIONS = {".aif", ".aiff", ".flac", ".m4a", ".mp3", ".ogg", ".wav"}
 
 
-def clamp01(value: float) -> float:
-    if not math.isfinite(float(value)):
+def clamp01(value: object) -> float:
+    numeric = safe_float(value)
+    if not math.isfinite(numeric):
         return 0.0
-    return max(0.0, min(1.0, float(value)))
+    return max(0.0, min(1.0, numeric))
 
 
-def safe_float(value: float, default: float = 0.0) -> float:
+def safe_float(value: object, default: float = 0.0) -> float:
     try:
-        result = float(value)
+        result = float(cast(Any, value))
     except (TypeError, ValueError):
         return default
     if not math.isfinite(result):

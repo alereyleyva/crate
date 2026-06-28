@@ -41,12 +41,14 @@ def analyze_track(path: Path, config: AnalysisConfig | None = None) -> TrackAnal
         sample_rate=audio.sr,
         channels=audio.channels,
     )
-    return TrackAnalysis(
-        track=metadata,
-        global_=global_features,
-        bands=bands.analysis,
-        timeline=Timeline(beats=beat_grid.beats, bars=bars),
-        sections=sections,
-        mix_points=mix_points,
-        llm=llm_summary,
+    return TrackAnalysis.model_validate(
+        {
+            "track": metadata,
+            "global": global_features,
+            "bands": bands.analysis,
+            "timeline": Timeline(beats=beat_grid.beats, bars=bars),
+            "sections": sections,
+            "mix_points": mix_points,
+            "llm": llm_summary,
+        }
     )

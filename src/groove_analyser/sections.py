@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from groove_analyser.schema import BarFeatures, Section
+from groove_analyser.schema import BarFeatures, Section, SectionLabel
 from groove_analyser.utils import clamp01, safe_mean, safe_peak
 
 
-def _section_label(position: float, energy: float, bass: float, onset: float, total_groups: int) -> str:
+def _section_label(position: float, energy: float, bass: float, onset: float, total_groups: int) -> SectionLabel:
     if position < 0.18 and energy < 0.65:
         return "intro"
     if position > 0.82 and energy < 0.7:
@@ -20,7 +20,7 @@ def _section_label(position: float, energy: float, bass: float, onset: float, to
     return "unknown"
 
 
-def _description(label: str, energy: float, bass: float, vocal: float) -> str:
+def _description(label: SectionLabel, energy: float, bass: float, vocal: float) -> str:
     density = "high-energy" if energy > 0.7 else "moderate" if energy > 0.4 else "reduced"
     low_end = "strong low-end" if bass > 0.65 else "controlled low-end"
     vocal_text = "noticeable vocal/midrange presence" if vocal > 0.55 else "low vocal presence"
@@ -56,7 +56,7 @@ def detect_sections(bars: list[BarFeatures], phrase_bars: int = 16) -> list[Sect
         )
         sections.append(
             Section(
-                label=label,  # type: ignore[arg-type]
+                label=label,
                 start=group[0].start,
                 end=group[-1].end,
                 start_bar=group[0].index,

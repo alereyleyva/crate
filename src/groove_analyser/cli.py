@@ -67,10 +67,12 @@ def analyze(
 
 def _print_analysis_summary(analysis: TrackAnalysis) -> None:
     console.print(
-        f"Duration: {format_time(analysis.track.duration_seconds)} | "
-        f"Sample rate: {analysis.track.sample_rate} Hz | "
-        f"Estimated BPM: {analysis.global_.bpm:.1f} | "
-        f"Sections: {', '.join(section.label for section in analysis.sections) or 'none'}"
+        (
+            f"Duration: {format_time(analysis.track.duration_seconds)} | "
+            f"Sample rate: {analysis.track.sample_rate} Hz | "
+            f"Estimated BPM: {analysis.global_.bpm:.1f} | "
+            f"Sections: {', '.join(section.label for section in analysis.sections) or 'none'}"
+        )
     )
 
 
