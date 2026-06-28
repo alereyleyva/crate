@@ -7,6 +7,33 @@ from groove_analyser.report import render_markdown
 from groove_analyser.schema import TrackAnalysis
 
 
+def track_output_paths(
+    filename: str,
+    out: Path,
+    export_json: bool = True,
+    export_markdown: bool = True,
+) -> dict[str, Path]:
+    stem = Path(filename).stem
+    paths: dict[str, Path] = {}
+    if export_json:
+        paths["json"] = out / f"{stem}.analysis.json"
+    if export_markdown:
+        paths["markdown"] = out / f"{stem}.report.md"
+    return paths
+
+
+def existing_track_outputs(
+    filename: str,
+    out: Path,
+    export_json: bool = True,
+    export_markdown: bool = True,
+) -> dict[str, str] | None:
+    paths = track_output_paths(filename, out, export_json, export_markdown)
+    if not paths or not all(path.exists() for path in paths.values()):
+        return None
+    return {name: str(path) for name, path in paths.items()}
+
+
 def write_track_outputs(
     analysis: TrackAnalysis,
     out: Path,
@@ -14,16 +41,16 @@ def write_track_outputs(
     export_markdown: bool = True,
 ) -> dict[str, str]:
     out.mkdir(parents=True, exist_ok=True)
-    stem = Path(analysis.track.filename).stem
+    paths = track_output_paths(analysis.track.filename, out, export_json, export_markdown)
     written: dict[str, str] = {}
 
-    if export_json:
-        json_path = out / f"{stem}.analysis.json"
+    json_path = paths.get("json")
+    if json_path is not None:
         _ = json_path.write_text(analysis.model_dump_json(by_alias=True, indent=2), encoding="utf-8")
         written["json"] = str(json_path)
 
-    if export_markdown:
-        report_path = out / f"{stem}.report.md"
+    report_path = paths.get("markdown")
+    if report_path is not None:
         _ = report_path.write_text(render_markdown(analysis), encoding="utf-8")
         written["markdown"] = str(report_path)
 

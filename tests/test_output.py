@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from groove_analyser.output import write_batch_index, write_track_outputs
+from groove_analyser.output import existing_track_outputs, track_output_paths, write_batch_index, write_track_outputs
 from groove_analyser.schema import TrackAnalysis, TrackMetadata
 
 
@@ -28,3 +28,20 @@ def test_write_batch_index(tmp_path: Path):
 
     assert index_path.exists()
     assert '"tracks"' in index_path.read_text(encoding="utf-8")
+
+
+def test_existing_track_outputs_returns_paths_when_requested_outputs_exist(tmp_path: Path):
+    paths = track_output_paths("track.wav", tmp_path, export_json=True, export_markdown=True)
+    paths["json"].write_text("{}", encoding="utf-8")
+    paths["markdown"].write_text("# Report", encoding="utf-8")
+
+    existing = existing_track_outputs("track.wav", tmp_path, export_json=True, export_markdown=True)
+
+    assert existing == {"json": str(paths["json"]), "markdown": str(paths["markdown"])}
+
+
+def test_existing_track_outputs_requires_all_requested_outputs(tmp_path: Path):
+    paths = track_output_paths("track.wav", tmp_path, export_json=True, export_markdown=True)
+    paths["json"].write_text("{}", encoding="utf-8")
+
+    assert existing_track_outputs("track.wav", tmp_path, export_json=True, export_markdown=True) is None
