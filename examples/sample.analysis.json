@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "track": {
+    "id": "example",
+    "filename": "sample.wav",
+    "path": "examples/sample.wav",
+    "duration_seconds": 0.0,
+    "sample_rate": 44100,
+    "channels": 2
+  }
+}
