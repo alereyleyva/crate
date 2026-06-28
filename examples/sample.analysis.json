@@ -4,8 +4,106 @@
     "id": "example",
     "filename": "sample.wav",
     "path": "examples/sample.wav",
-    "duration_seconds": 0.0,
+    "duration_seconds": 382.4,
     "sample_rate": 44100,
     "channels": 2
+  },
+  "global": {
+    "bpm": 132.0,
+    "tempo_confidence": 0.82,
+    "key": "F minor",
+    "key_confidence": 0.61,
+    "camelot": "4A",
+    "energy": 0.84,
+    "bass_weight": 0.68,
+    "brightness": 0.42,
+    "percussiveness": 0.74,
+    "dynamic_range": 0.39,
+    "vocal_presence_estimate": 0.18,
+    "spectral_centroid": 0.24,
+    "spectral_bandwidth": 0.31,
+    "spectral_rolloff": 0.48,
+    "spectral_flatness": 0.04,
+    "rms_energy": 0.72,
+    "zero_crossing_rate": 0.16
+  },
+  "bands": {
+    "definitions_hz": {
+      "sub": [20, 60],
+      "bass": [60, 250],
+      "low_mid": [250, 800],
+      "mid": [800, 2500],
+      "high_mid": [2500, 6000],
+      "high": [6000, 16000]
+    },
+    "summary": {
+      "low_mean": 0.62,
+      "mid_mean": 0.34,
+      "high_mean": 0.28,
+      "low_peak": 0.94,
+      "mid_peak": 0.72,
+      "high_peak": 0.61
+    }
+  },
+  "timeline": {
+    "beats": [
+      {"index": 1, "time": 0.0},
+      {"index": 2, "time": 0.45}
+    ],
+    "bars": [
+      {
+        "index": 1,
+        "start": 0.0,
+        "end": 1.82,
+        "energy": 0.61,
+        "low": 0.72,
+        "mid": 0.31,
+        "high": 0.28,
+        "bass_weight": 0.72,
+        "brightness": 0.22,
+        "onset_density": 0.44,
+        "vocal_presence_estimate": 0.02,
+        "chroma": [0.01, 0.02, 0.08, 0.12, 0.04, 0.2, 0.1, 0.03, 0.09, 0.11, 0.04, 0.16]
+      }
+    ]
+  },
+  "sections": [
+    {
+      "label": "intro",
+      "start": 0.0,
+      "end": 48.0,
+      "start_bar": 1,
+      "end_bar": 32,
+      "energy_mean": 0.42,
+      "energy_peak": 0.61,
+      "bass_weight": 0.48,
+      "brightness": 0.31,
+      "vocal_presence_estimate": 0.01,
+      "mixability": 0.93,
+      "description": "Intro section with moderate arrangement, controlled low-end and low vocal presence."
+    }
+  ],
+  "mix_points": {
+    "best_mix_in": [
+      {
+        "start": 0.0,
+        "end": 48.0,
+        "start_bar": 1,
+        "end_bar": 32,
+        "score": 0.93,
+        "reason": "Stable phrase-aligned section with relatively low vocal presence."
+      }
+    ],
+    "best_mix_out": [],
+    "safe_loop_regions": [],
+    "high_risk_regions": []
+  },
+  "llm": {
+    "summary": "High-energy electronic track at 132.0 BPM in F minor (4A), with bass-heavy low-end and sparse vocals. Detected structure: intro, drop, breakdown, outro.",
+    "recommended_matching_strategy": "Match with tracks around 130-134 BPM, compatible Camelot keys near 4A, and avoid layering bass-heavy or vocal-heavy sections.",
+    "warnings": [
+      "Dense high-energy section; avoid overlapping with another drop."
+    ],
+    "tags": ["electronic", "high-energy", "bass-heavy", "instrumental", "drop-focused"]
   }
 }
