@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Annotated
 
@@ -8,8 +7,10 @@ import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from groove_analyser.config import AnalysisConfig
+from groove_analyser.output import write_batch_index, write_track_outputs
 from groove_analyser.pipeline import analyze_track
-from groove_analyser.report import render_markdown
+from groove_analyser.schema import TrackAnalysis
 from groove_analyser.utils import audio_files_in, format_time
 
 
@@ -41,18 +42,19 @@ def analyze(
     track_out = out / "tracks" if batch_mode else out
     track_out.mkdir(parents=True, exist_ok=True)
     index_entries: list[dict[str, str]] = []
+    config = AnalysisConfig(frames_per_second=frames_per_second)
 
     with Progress(SpinnerColumn(), TextColumn("{task.description}"), console=console) as progress:
         for file in files:
             task = progress.add_task(f"Analyzing {file.name}", total=None)
-            analysis = analyze_track(file, frames_per_second=frames_per_second)
-            written = _write_outputs(analysis, track_out, export_json, export_markdown)
+            analysis = analyze_track(file, config=config)
+            written = write_track_outputs(analysis, track_out, export_json, export_markdown)
             index_entries.append({"filename": file.name, **written})
+            _print_analysis_summary(analysis)
             progress.update(task, description=f"Analyzed {file.name}")
 
     if batch_mode:
-        index_path = out / "index.json"
-        index_path.write_text(json.dumps({"tracks": index_entries}, indent=2), encoding="utf-8")
+        index_path = write_batch_index(out, index_entries)
         console.print(f"Wrote index: [green]{index_path}[/green]")
 
     for entry in index_entries:
@@ -63,24 +65,13 @@ def analyze(
             console.print(f"Markdown: [green]{entry['markdown']}[/green]")
 
 
-def _write_outputs(analysis, out: Path, export_json: bool, export_markdown: bool) -> dict[str, str]:
-    stem = Path(analysis.track.filename).stem
-    written: dict[str, str] = {}
-    if export_json:
-        json_path = out / f"{stem}.analysis.json"
-        json_path.write_text(analysis.model_dump_json(by_alias=True, indent=2), encoding="utf-8")
-        written["json"] = str(json_path)
-    if export_markdown:
-        report_path = out / f"{stem}.report.md"
-        report_path.write_text(render_markdown(analysis), encoding="utf-8")
-        written["markdown"] = str(report_path)
+def _print_analysis_summary(analysis: TrackAnalysis) -> None:
     console.print(
         f"Duration: {format_time(analysis.track.duration_seconds)} | "
         f"Sample rate: {analysis.track.sample_rate} Hz | "
         f"Estimated BPM: {analysis.global_.bpm:.1f} | "
         f"Sections: {', '.join(section.label for section in analysis.sections) or 'none'}"
     )
-    return written
 
 
 if __name__ == "__main__":

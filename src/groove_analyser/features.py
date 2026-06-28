@@ -6,21 +6,9 @@ import numpy as np
 import librosa
 
 from groove_analyser.bands import BandCurves
+from groove_analyser.keys import estimate_key
 from groove_analyser.schema import BarFeatures, GlobalFeatures
 from groove_analyser.utils import clamp01, mean_between, normalize_curve, safe_mean, safe_peak, vector_mean_between
-
-
-KEY_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-MAJOR_PROFILE = np.array([6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88])
-MINOR_PROFILE = np.array([6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17])
-MAJOR_CAMELOT = {
-    "C": "8B", "C#": "3B", "D": "10B", "D#": "5B", "E": "12B", "F": "7B",
-    "F#": "2B", "G": "9B", "G#": "4B", "A": "11B", "A#": "6B", "B": "1B",
-}
-MINOR_CAMELOT = {
-    "C": "5A", "C#": "12A", "D": "7A", "D#": "2A", "E": "9A", "F": "4A",
-    "F#": "11A", "G": "6A", "G#": "1A", "A": "8A", "A#": "3A", "B": "10A",
-}
 
 
 @dataclass(frozen=True)
@@ -37,6 +25,20 @@ class FeatureCurves:
     chroma: np.ndarray
     brightness: np.ndarray
     vocal_presence: np.ndarray
+
+
+@dataclass(frozen=True)
+class RawBarFeatures:
+    start: float
+    end: float
+    raw_energy: float
+    low: float
+    mid: float
+    high: float
+    brightness: float
+    onset_density: float
+    vocal_presence_estimate: float
+    chroma: list[float]
 
 
 def compute_feature_curves(y: np.ndarray, sr: int, hop_length: int, bands: BandCurves) -> FeatureCurves:
@@ -75,7 +77,11 @@ def compute_feature_curves(y: np.ndarray, sr: int, hop_length: int, bands: BandC
     mid = bands.mid[:min_frames]
     low = bands.low[:min_frames]
     brightness = np.clip((centroid * 0.5) + (high * 0.5), 0.0, 1.0)
-    vocal_presence = np.clip((mid * 0.45) + ((1.0 - onset) * 0.25) + ((1.0 - low) * 0.15) + ((1.0 - flatness) * 0.15), 0.0, 1.0)
+    vocal_presence = np.clip(
+        (mid * 0.45) + ((1.0 - onset) * 0.25) + ((1.0 - low) * 0.15) + ((1.0 - flatness) * 0.15),
+        0.0,
+        1.0,
+    )
     times = bands.times[:min_frames]
     return FeatureCurves(
         times=times,
@@ -91,27 +97,6 @@ def compute_feature_curves(y: np.ndarray, sr: int, hop_length: int, bands: BandC
         brightness=brightness,
         vocal_presence=vocal_presence,
     )
-
-
-def estimate_key(chroma: np.ndarray) -> tuple[str, float, str]:
-    if chroma.size == 0:
-        return "Unknown", 0.0, "Unknown"
-    profile = np.nanmean(chroma, axis=1)
-    if float(np.sum(profile)) <= 0:
-        return "Unknown", 0.0, "Unknown"
-    profile = profile / np.sum(profile)
-    scores: list[tuple[float, str, str]] = []
-    for index, name in enumerate(KEY_NAMES):
-        major = np.roll(MAJOR_PROFILE, index)
-        minor = np.roll(MINOR_PROFILE, index)
-        scores.append((float(np.corrcoef(profile, major)[0, 1]), f"{name} major", MAJOR_CAMELOT[name]))
-        scores.append((float(np.corrcoef(profile, minor)[0, 1]), f"{name} minor", MINOR_CAMELOT[name]))
-    scores = [(0.0 if not np.isfinite(score) else score, key, camelot) for score, key, camelot in scores]
-    scores.sort(reverse=True, key=lambda item: item[0])
-    best_score, key, camelot = scores[0]
-    second_score = scores[1][0] if len(scores) > 1 else 0.0
-    confidence = clamp01((best_score - second_score + 0.25) / 0.5)
-    return key, confidence, camelot
 
 
 def compute_global_features(curves: FeatureCurves, bands: BandCurves, bpm: float, tempo_confidence: float) -> GlobalFeatures:
@@ -143,7 +128,7 @@ def compute_global_features(curves: FeatureCurves, bands: BandCurves, bpm: float
 
 
 def compute_bar_features(bar_times: list[tuple[float, float]], curves: FeatureCurves, bands: BandCurves) -> list[BarFeatures]:
-    raw_bars: list[dict[str, float | list[float]]] = []
+    raw_bars: list[RawBarFeatures] = []
     raw_energies: list[float] = []
     for start, end in bar_times:
         low = mean_between(bands.times, bands.low, start, end)
@@ -152,18 +137,18 @@ def compute_bar_features(bar_times: list[tuple[float, float]], curves: FeatureCu
         raw_energy = clamp01((mean_between(curves.times, curves.rms, start, end) * 0.55) + (mean_between(curves.times, curves.onset, start, end) * 0.25) + (((low + mid + high) / 3.0) * 0.2))
         raw_energies.append(raw_energy)
         raw_bars.append(
-            {
-                "start": float(start),
-                "end": float(end),
-                "low": low,
-                "mid": mid,
-                "high": high,
-                "bass_weight": low,
-                "brightness": clamp01((mean_between(curves.times, curves.centroid, start, end) * 0.5) + (high * 0.5)),
-                "onset_density": mean_between(curves.times, curves.onset, start, end),
-                "vocal_presence_estimate": mean_between(curves.times, curves.vocal_presence, start, end),
-                "chroma": vector_mean_between(curves.times, curves.chroma, start, end),
-            }
+            RawBarFeatures(
+                start=float(start),
+                end=float(end),
+                raw_energy=raw_energy,
+                low=low,
+                mid=mid,
+                high=high,
+                brightness=clamp01((mean_between(curves.times, curves.centroid, start, end) * 0.5) + (high * 0.5)),
+                onset_density=mean_between(curves.times, curves.onset, start, end),
+                vocal_presence_estimate=mean_between(curves.times, curves.vocal_presence, start, end),
+                chroma=vector_mean_between(curves.times, curves.chroma, start, end),
+            )
         )
 
     relative_energies = normalize_curve(np.asarray(raw_energies, dtype=float))
@@ -172,17 +157,17 @@ def compute_bar_features(bar_times: list[tuple[float, float]], curves: FeatureCu
         bars.append(
             BarFeatures(
                 index=index,
-                start=float(raw_bar["start"]),
-                end=float(raw_bar["end"]),
+                start=raw_bar.start,
+                end=raw_bar.end,
                 energy=float(relative_energies[index - 1]) if relative_energies.size else 0.0,
-                low=float(raw_bar["low"]),
-                mid=float(raw_bar["mid"]),
-                high=float(raw_bar["high"]),
-                bass_weight=float(raw_bar["bass_weight"]),
-                brightness=float(raw_bar["brightness"]),
-                onset_density=float(raw_bar["onset_density"]),
-                vocal_presence_estimate=float(raw_bar["vocal_presence_estimate"]),
-                chroma=raw_bar["chroma"],  # type: ignore[arg-type]
+                low=raw_bar.low,
+                mid=raw_bar.mid,
+                high=raw_bar.high,
+                bass_weight=raw_bar.low,
+                brightness=raw_bar.brightness,
+                onset_density=raw_bar.onset_density,
+                vocal_presence_estimate=raw_bar.vocal_presence_estimate,
+                chroma=raw_bar.chroma,
             )
         )
     return bars
