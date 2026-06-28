@@ -18,8 +18,14 @@ class BeatGrid:
     beats: list[Beat]
 
 
-def estimate_beat_grid(y: np.ndarray, sr: int, duration: float, hop_length: int) -> BeatGrid:
-    onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
+def estimate_beat_grid(
+    y: np.ndarray,
+    sr: int,
+    duration: float,
+    hop_length: int,
+    onset_envelope: np.ndarray | None = None,
+) -> BeatGrid:
+    onset_env = onset_envelope if onset_envelope is not None else librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
     tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr, onset_envelope=onset_env, hop_length=hop_length, trim=False)
     tempo_value = safe_float(np.asarray(tempo).reshape(-1)[0] if np.asarray(tempo).size else tempo)
     beat_times = librosa.frames_to_time(beat_frames, sr=sr, hop_length=hop_length)

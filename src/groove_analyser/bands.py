@@ -20,6 +20,16 @@ BAND_DEFINITIONS: dict[str, tuple[int, int]] = {
 
 
 @dataclass(frozen=True)
+class SpectralData:
+    n_fft: int
+    hop_length: int
+    magnitude: np.ndarray
+    power: np.ndarray
+    frequencies: np.ndarray
+    times: np.ndarray
+
+
+@dataclass(frozen=True)
 class BandCurves:
     times: np.ndarray
     bands: dict[str, np.ndarray]
@@ -29,11 +39,33 @@ class BandCurves:
     analysis: BandAnalysis
 
 
-def compute_band_curves(y: np.ndarray, sr: int, hop_length: int) -> BandCurves:
-    stft = librosa.stft(y, n_fft=4096, hop_length=hop_length)
-    power = np.abs(stft) ** 2
-    frequencies = librosa.fft_frequencies(sr=sr, n_fft=4096)
+def compute_spectral_data(y: np.ndarray, sr: int, hop_length: int, n_fft: int = 4096) -> SpectralData:
+    stft = librosa.stft(y, n_fft=n_fft, hop_length=hop_length)
+    magnitude = np.abs(stft).astype(np.float32, copy=False)
+    power = np.square(magnitude).astype(np.float32, copy=False)
+    frequencies = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
     times = librosa.frames_to_time(np.arange(power.shape[1]), sr=sr, hop_length=hop_length)
+    return SpectralData(
+        n_fft=n_fft,
+        hop_length=hop_length,
+        magnitude=magnitude,
+        power=power,
+        frequencies=frequencies,
+        times=times,
+    )
+
+
+def compute_band_curves(
+    y: np.ndarray,
+    sr: int,
+    hop_length: int,
+    n_fft: int = 4096,
+    spectral: SpectralData | None = None,
+) -> BandCurves:
+    spectral = spectral or compute_spectral_data(y, sr, hop_length, n_fft=n_fft)
+    power = spectral.power
+    frequencies = spectral.frequencies
+    times = spectral.times
 
     band_curves: dict[str, np.ndarray] = {}
     for name, (low_hz, high_hz) in BAND_DEFINITIONS.items():

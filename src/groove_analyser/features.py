@@ -5,7 +5,8 @@ from dataclasses import dataclass
 import numpy as np
 import librosa
 
-from groove_analyser.bands import BandCurves
+from groove_analyser.bands import BandCurves, SpectralData, compute_spectral_data
+from groove_analyser.config import KeyMode
 from groove_analyser.keys import estimate_key
 from groove_analyser.schema import BarFeatures, GlobalFeatures
 from groove_analyser.utils import clamp01, mean_between, normalize_curve, safe_mean, safe_peak, vector_mean_between
@@ -41,18 +42,40 @@ class RawBarFeatures:
     chroma: list[float]
 
 
-def compute_feature_curves(y: np.ndarray, sr: int, hop_length: int, bands: BandCurves) -> FeatureCurves:
-    rms_raw = librosa.feature.rms(y=y, hop_length=hop_length)[0]
-    centroid_raw = librosa.feature.spectral_centroid(y=y, sr=sr, hop_length=hop_length)[0]
-    bandwidth_raw = librosa.feature.spectral_bandwidth(y=y, sr=sr, hop_length=hop_length)[0]
-    rolloff_raw = librosa.feature.spectral_rolloff(y=y, sr=sr, hop_length=hop_length)[0]
-    flatness_raw = librosa.feature.spectral_flatness(y=y, hop_length=hop_length)[0]
-    zcr_raw = librosa.feature.zero_crossing_rate(y, hop_length=hop_length)[0]
-    onset_raw = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
-    try:
-        chroma = librosa.feature.chroma_cqt(y=y, sr=sr, hop_length=hop_length)
-    except Exception:
-        chroma = librosa.feature.chroma_stft(y=y, sr=sr, hop_length=hop_length)
+def compute_onset_envelope(
+    y: np.ndarray,
+    sr: int,
+    hop_length: int,
+    spectral: SpectralData | None = None,
+) -> np.ndarray:
+    if spectral is None:
+        onset = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
+    else:
+        spectrum_db = librosa.amplitude_to_db(spectral.magnitude, ref=np.max)
+        onset = librosa.onset.onset_strength(S=spectrum_db, sr=sr, hop_length=hop_length)
+    return np.nan_to_num(np.asarray(onset, dtype=np.float32), nan=0.0, posinf=0.0, neginf=0.0)
+
+
+def compute_feature_curves(
+    y: np.ndarray,
+    sr: int,
+    hop_length: int,
+    bands: BandCurves,
+    spectral: SpectralData | None = None,
+    onset_envelope: np.ndarray | None = None,
+    key_mode: KeyMode = "stft",
+) -> FeatureCurves:
+    spectral = spectral or compute_spectral_data(y, sr, hop_length)
+    magnitude = spectral.magnitude
+    centroid_feature = librosa.feature.spectral_centroid(S=magnitude, sr=sr, freq=spectral.frequencies)
+    rms_raw = librosa.feature.rms(S=magnitude, frame_length=spectral.n_fft, hop_length=hop_length)[0]
+    centroid_raw = centroid_feature[0]
+    bandwidth_raw = librosa.feature.spectral_bandwidth(S=magnitude, sr=sr, freq=spectral.frequencies, centroid=centroid_feature)[0]
+    rolloff_raw = librosa.feature.spectral_rolloff(S=magnitude, sr=sr, freq=spectral.frequencies)[0]
+    flatness_raw = librosa.feature.spectral_flatness(S=magnitude)[0]
+    zcr_raw = librosa.feature.zero_crossing_rate(y, frame_length=spectral.n_fft, hop_length=hop_length)[0]
+    onset_raw = onset_envelope if onset_envelope is not None else compute_onset_envelope(y, sr, hop_length, spectral)
+    chroma = _compute_chroma(y, sr, hop_length, spectral, key_mode)
 
     min_frames = min(
         rms_raw.size,
@@ -97,6 +120,23 @@ def compute_feature_curves(y: np.ndarray, sr: int, hop_length: int, bands: BandC
         brightness=brightness,
         vocal_presence=vocal_presence,
     )
+
+
+def _compute_chroma(
+    y: np.ndarray,
+    sr: int,
+    hop_length: int,
+    spectral: SpectralData,
+    key_mode: KeyMode,
+) -> np.ndarray:
+    if key_mode == "none":
+        return np.zeros((12, spectral.power.shape[1]), dtype=np.float32)
+    if key_mode == "cqt":
+        try:
+            return librosa.feature.chroma_cqt(y=y, sr=sr, hop_length=hop_length)
+        except Exception:
+            pass
+    return librosa.feature.chroma_stft(S=spectral.power, sr=sr, n_fft=spectral.n_fft)
 
 
 def compute_global_features(curves: FeatureCurves, bands: BandCurves, bpm: float, tempo_confidence: float) -> GlobalFeatures:
