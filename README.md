@@ -1,6 +1,6 @@
-# Groove Analyser
+# crate
 
-Groove Analyser is a Python CLI for producing LLM-friendly musical analysis reports for DJ-oriented electronic music.
+crate is a Python CLI for finding mix points, structure, BPM and key in electronic tracks.
 
 It analyzes audio files and exports:
 
@@ -39,35 +39,35 @@ Supported input extensions:
 
 ## Install From GitHub
 
-For CLI usage, `uv tool install` is recommended because it installs the app in an isolated environment and exposes `groove-analyser` globally.
+For CLI usage, `uv tool install` is recommended because it installs the app in an isolated environment and exposes `crate` globally.
 
 ```bash
-uv tool install git+https://github.com/<owner>/groove-analyser.git
+uv tool install git+https://github.com/<owner>/crate.git
 ```
 
 Then run it from any folder:
 
 ```bash
-groove-analyser analyze ./music/track.mp3 --out ./reports
+crate analyze ./music/track.mp3 --out ./reports
 ```
 
 Upgrade after pulling new commits or tags:
 
 ```bash
-uv tool upgrade groove-analyser
+uv tool upgrade crate
 ```
 
 Install a specific tag:
 
 ```bash
-uv tool install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
+uv tool install git+https://github.com/<owner>/crate.git@v0.1.0
 ```
 
 ## Install For Development
 
 ```bash
-git clone https://github.com/<owner>/groove-analyser.git
-cd groove-analyser
+git clone https://github.com/<owner>/crate.git
+cd crate
 uv sync --extra dev
 ```
 
@@ -86,19 +86,19 @@ uv run basedpyright
 Run the CLI from the local environment:
 
 ```bash
-uv run groove-analyser --help
+uv run crate --help
 ```
 
 ## Quick Start
 
 ```bash
-groove-analyser analyze ./audio/track.mp3 --out ./reports
+crate analyze ./audio/track.mp3 --out ./reports
 ```
 
 During development, prefix commands with `uv run`:
 
 ```bash
-uv run groove-analyser analyze ./audio/track.mp3 --out ./reports
+uv run crate analyze ./audio/track.mp3 --out ./reports
 ```
 
 This creates:
@@ -114,19 +114,19 @@ reports/
 Analyze a single file:
 
 ```bash
-groove-analyser analyze ./audio/track.mp3
+crate analyze ./audio/track.mp3
 ```
 
 Set output folder:
 
 ```bash
-groove-analyser analyze ./audio/track.mp3 --out ./reports
+crate analyze ./audio/track.mp3 --out ./reports
 ```
 
 Analyze a folder:
 
 ```bash
-groove-analyser analyze ./audio-folder --out ./reports
+crate analyze ./audio-folder --out ./reports
 ```
 
 Folder mode creates:
@@ -144,25 +144,25 @@ reports/
 Export only JSON:
 
 ```bash
-groove-analyser analyze ./track.mp3 --json --no-markdown
+crate analyze ./track.mp3 --json --no-markdown
 ```
 
 Export only Markdown:
 
 ```bash
-groove-analyser analyze ./track.mp3 --no-json --markdown
+crate analyze ./track.mp3 --no-json --markdown
 ```
 
 Change analysis frame rate:
 
 ```bash
-groove-analyser analyze ./track.mp3 --frames-per-second 20
+crate analyze ./track.mp3 --frames-per-second 20
 ```
 
 Analyze a large folder faster:
 
 ```bash
-groove-analyser analyze ./audio-folder --out ./reports --fast --workers 4 --skip-existing
+crate analyze ./audio-folder --out ./reports --fast --workers 4 --skip-existing
 ```
 
 Performance-oriented options:
@@ -191,7 +191,7 @@ mix_points
 llm
 ```
 
-The schema is defined in `src/groove_analyser/schema.py`.
+The schema is defined in `src/crate/schema.py`.
 
 ### Markdown
 
@@ -215,7 +215,7 @@ The Markdown output is intended for human review and LLM context. It includes:
 ## Project Layout
 
 ```text
-src/groove_analyser/
+src/crate/
   cli.py          CLI entrypoint
   config.py       Analysis configuration
   pipeline.py     End-to-end analysis orchestration
@@ -247,7 +247,7 @@ git push origin v0.1.0
 3. Install from another machine or folder:
 
 ```bash
-uv tool install git+https://github.com/<owner>/groove-analyser.git@v0.1.0
+uv tool install git+https://github.com/<owner>/crate.git@v0.1.0
 ```
 
 See `docs/releasing.md` for the full workflow.

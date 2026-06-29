@@ -1,6 +1,6 @@
 # Architecture
 
-Groove Analyser is organized around a small analysis pipeline with explicit module responsibilities.
+crate is organized around a small analysis pipeline with explicit module responsibilities.
 
 ## Flow
 
