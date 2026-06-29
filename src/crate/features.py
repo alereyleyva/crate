@@ -5,11 +5,11 @@ from dataclasses import dataclass
 import numpy as np
 import librosa
 
-from groove_analyser.bands import BandCurves, SpectralData, compute_spectral_data
-from groove_analyser.config import KeyMode
-from groove_analyser.keys import estimate_key
-from groove_analyser.schema import BarFeatures, GlobalFeatures
-from groove_analyser.utils import clamp01, mean_between, normalize_curve, safe_mean, safe_peak, vector_mean_between
+from crate.bands import BandCurves, SpectralData, compute_spectral_data
+from crate.config import KeyMode
+from crate.keys import estimate_key
+from crate.schema import BarFeatures, GlobalFeatures
+from crate.utils import clamp01, mean_between, normalize_curve, safe_mean, safe_peak, vector_mean_between
 
 
 @dataclass(frozen=True)

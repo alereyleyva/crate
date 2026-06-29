@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from groove_analyser.schema import MixRegion, TrackAnalysis
-from groove_analyser.utils import format_time
+from crate.schema import MixRegion, TrackAnalysis
+from crate.utils import format_time
 
 
 def render_markdown(analysis: TrackAnalysis) -> str:

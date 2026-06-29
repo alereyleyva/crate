@@ -4,8 +4,8 @@ from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from groove_analyser import __version__
-from groove_analyser.utils import clamp01, safe_float
+from crate import __version__
+from crate.utils import clamp01, safe_float
 
 
 SectionLabel = Literal["intro", "groove", "breakdown", "build", "drop", "outro", "unknown"]

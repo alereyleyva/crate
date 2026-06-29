@@ -3,14 +3,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "groove-analyser"
+name = "crate"
 version = "0.1.0"
-description = "LLM-friendly music analysis CLI for DJ-oriented tracks."
+description = "DJ-ready structure and mix-point analysis for electronic tracks."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
-  { name = "Groove Analyser" }
+  { name = "crate" }
 ]
 dependencies = [
   "librosa>=0.10.0",
@@ -29,7 +29,7 @@ dev = [
 ]
 
 [project.scripts]
-groove-analyser = "groove_analyser.cli:app"
+crate = "crate.cli:app"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

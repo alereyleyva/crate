@@ -3,15 +3,15 @@ from __future__ import annotations
 from pathlib import Path
 from uuid import uuid5, NAMESPACE_URL
 
-from groove_analyser.audio import load_audio
-from groove_analyser.bands import compute_band_curves, compute_spectral_data
-from groove_analyser.beats import estimate_beat_grid
-from groove_analyser.config import AnalysisConfig
-from groove_analyser.features import compute_bar_features, compute_feature_curves, compute_global_features, compute_onset_envelope
-from groove_analyser.mixpoints import build_llm_summary, detect_mix_points
-from groove_analyser.schema import Timeline, TrackAnalysis, TrackMetadata
-from groove_analyser.sections import detect_sections
-from groove_analyser.utils import clamp01, safe_mean
+from crate.audio import load_audio
+from crate.bands import compute_band_curves, compute_spectral_data
+from crate.beats import estimate_beat_grid
+from crate.config import AnalysisConfig
+from crate.features import compute_bar_features, compute_feature_curves, compute_global_features, compute_onset_envelope
+from crate.mixpoints import build_llm_summary, detect_mix_points
+from crate.schema import Timeline, TrackAnalysis, TrackMetadata
+from crate.sections import detect_sections
+from crate.utils import clamp01, safe_mean
 
 
 def analyze_track(path: Path, config: AnalysisConfig | None = None) -> TrackAnalysis:

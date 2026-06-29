@@ -1,6 +1,6 @@
 import numpy as np
 
-from groove_analyser.keys import estimate_key
+from crate.keys import estimate_key
 
 
 def test_estimate_key_handles_empty_chroma():

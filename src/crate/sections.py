@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from groove_analyser.schema import BarFeatures, Section, SectionLabel
-from groove_analyser.utils import clamp01, safe_mean, safe_peak
+from crate.schema import BarFeatures, Section, SectionLabel
+from crate.utils import clamp01, safe_mean, safe_peak
 
 
 def _section_label(position: float, energy: float, bass: float, onset: float, total_groups: int) -> SectionLabel:

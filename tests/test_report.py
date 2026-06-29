@@ -1,5 +1,5 @@
-from groove_analyser.report import render_markdown
-from groove_analyser.schema import LLMSummary, Section, TrackAnalysis, TrackMetadata
+from crate.report import render_markdown
+from crate.schema import LLMSummary, Section, TrackAnalysis, TrackMetadata
 
 
 def test_report_contains_expected_sections():

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from groove_analyser.schema import GlobalFeatures, LLMSummary, MixPoints, MixRegion, RiskRegion, Section
-from groove_analyser.utils import clamp01
+from crate.schema import GlobalFeatures, LLMSummary, MixPoints, MixRegion, RiskRegion, Section
+from crate.utils import clamp01
 
 
 def detect_mix_points(sections: list[Section]) -> MixPoints:

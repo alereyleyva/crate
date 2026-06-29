@@ -1,4 +1,4 @@
-from groove_analyser.config import AnalysisConfig
+from crate.config import AnalysisConfig
 
 
 def test_analysis_config_computes_hop_length_from_frame_rate():

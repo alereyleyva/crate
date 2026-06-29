@@ -1,4 +1,4 @@
-from groove_analyser.schema import TrackAnalysis, TrackMetadata
+from crate.schema import TrackAnalysis, TrackMetadata
 
 
 def test_track_analysis_schema_serializes_with_global_alias():

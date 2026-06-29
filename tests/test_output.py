@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from groove_analyser.output import existing_track_outputs, track_output_paths, write_batch_index, write_track_outputs
-from groove_analyser.schema import TrackAnalysis, TrackMetadata
+from crate.output import existing_track_outputs, track_output_paths, write_batch_index, write_track_outputs
+from crate.schema import TrackAnalysis, TrackMetadata
 
 
 def test_write_track_outputs_respects_requested_formats(tmp_path: Path):

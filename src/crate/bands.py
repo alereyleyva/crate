@@ -5,8 +5,8 @@ from dataclasses import dataclass
 import numpy as np
 import librosa
 
-from groove_analyser.schema import BandAnalysis, BandDefinitions, BandSummary
-from groove_analyser.utils import clamp01, normalize_curve, safe_mean, safe_peak
+from crate.schema import BandAnalysis, BandDefinitions, BandSummary
+from crate.utils import clamp01, normalize_curve, safe_mean, safe_peak
 
 
 BAND_DEFINITIONS: dict[str, tuple[int, int]] = {

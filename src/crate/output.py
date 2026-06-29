@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from groove_analyser.report import render_markdown
-from groove_analyser.schema import TrackAnalysis
+from crate.report import render_markdown
+from crate.schema import TrackAnalysis
 
 
 def track_output_paths(

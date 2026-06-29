@@ -5,8 +5,8 @@ from dataclasses import dataclass
 import numpy as np
 import librosa
 
-from groove_analyser.schema import Beat
-from groove_analyser.utils import clamp01, safe_float
+from crate.schema import Beat
+from crate.utils import clamp01, safe_float
 
 
 @dataclass(frozen=True)

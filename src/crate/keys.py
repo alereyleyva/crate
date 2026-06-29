@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from groove_analyser.utils import clamp01
+from crate.utils import clamp01
 
 
 KEY_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]

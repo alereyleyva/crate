@@ -1,6 +1,6 @@
 import numpy as np
 
-from groove_analyser.bands import compute_band_curves
+from crate.bands import compute_band_curves
 
 
 def test_band_curves_are_normalized_without_nan():

@@ -9,13 +9,13 @@ import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from groove_analyser.config import AnalysisConfig, KeyMode
-from groove_analyser.output import existing_track_outputs, write_batch_index, write_track_outputs
-from groove_analyser.pipeline import analyze_track
-from groove_analyser.utils import audio_files_in, format_time
+from crate.config import AnalysisConfig, KeyMode
+from crate.output import existing_track_outputs, write_batch_index, write_track_outputs
+from crate.pipeline import analyze_track
+from crate.utils import audio_files_in, format_time
 
 
-app = typer.Typer(help="Groove Analyser: LLM-friendly music analysis for DJ-oriented tracks.")
+app = typer.Typer(help="crate: DJ-ready structure and mix-point analysis for electronic tracks.")
 console = Console()
 
 
@@ -32,7 +32,7 @@ class AnalysisResult(TypedDict):
 
 @app.callback()
 def main() -> None:
-    """Groove Analyser command group."""
+    """crate command group."""
 
 
 @app.command()
